@@ -1,0 +1,84 @@
+# Define the applications properties here:
+
+LIB_NAME = SDL_ttf
+
+
+SPMP=../../../../../../
+LIBGAME=$(SPMP)libgame/
+
+CPP       = arm-none-eabi-g++
+CC        = arm-none-eabi-gcc
+AR        = arm-none-eabi-ar
+
+# Define the compiler settings here:
+
+SOURCE    = . 
+CPP_OPTS  =  -O3 $(INCLUDE) -mcpu=arm926ej-s msoft-float -fno-pic $(W_OPTS) -DMPU_JZ4740 -c
+CC_OPTS   = -O3 $(INCLUDE) -mcpu=arm926ej-s -fno-pic $(W_OPTS) -DMPU_JZ4740 $(SDL_MIXER) -c
+W_OPTS    = -Wall -Wextra -finline-functions -fomit-frame-pointer -msoft-float -fno-builtin -fno-exceptions
+CC_OPTS_A = $(CC_OPTS) -D_ASSEMBLER_
+# Find all source files
+LIB_PATH  = $(LIBGAME)
+INCLUDE   = -I. -I./include -I$(SPMP)/include -I$(SPMP)/include/libpng -I$(SPMP)/include/SDL -I$(SPMP)/include/zlib -I$(SPMP)/include/mikmod
+SDL_MIXER = -DWAV_MUSIC -DOGG_MUSIC -DOGG_USE_TREMOR -DMOD_MUSIC
+
+# Find all source files
+
+SRC_CPP = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.cpp))
+SRC_C   = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.c))
+SRC_H_INC = $(foreach dir, $(SOURCE), $(wildcard $(dir)/include/*.h))
+SRC_H_TTF = SDL_ttf.h
+SRC_H_IMG = ../SDL_image/SDL_image.h
+SRC_H_MIX = ../SDL_mixer/SDL_mixer.h
+SRC_H   = $(SRC_H_INC) $(SRC_H_TTF) $(SRC_H_IMG) $(SRC_H_MIX)
+SRC_S   = $(foreach dir, $(SOURCE), $(wildcard $(dir)/*.S))
+OBJ_CPP = $(patsubst %.cpp, %.o, $(SRC_CPP))
+OBJ_C   = $(patsubst %.c, %.o, $(SRC_C))
+OBJ_S   = $(patsubst %.S, %.o, $(SRC_S))
+OBJ     = $(OBJ_CPP) $(OBJ_C) $(OBJ_S)
+
+# Debug
+#$(warning $(OBJ_C))
+#$(warning $(SRC_H))
+
+# Compile rules.
+
+.PHONY : all
+
+all : $(LIB_PATH)/lib$(LIB_NAME).a
+
+$(LIB_PATH)/lib$(LIB_NAME).a : $(OBJ)
+#	$(AR) rcs $(LIB_PATH)/lib$(LIB_NAME).a *.o
+	$(AR) rcs $(LIB_PATH)/lib$(LIB_NAME).a $^
+	make headers
+
+$(OBJ_CPP) : %.o : %.cpp
+	$(CPP) $(CPP_OPTS) -o $@ $<
+
+$(OBJ_C) : %.o : %.c
+	$(CC) $(CC_OPTS) -o $@ $<
+
+$(OBJ_S) : %.o : %.S
+	$(CC) $(CC_OPTS_A) -o $@ $<
+
+
+
+# Clean rules
+
+.PHONY : clean
+
+clean :
+	rm -f $(OBJ)
+	rm -f $(LIB_PATH)/lib$(LIB_NAME).a
+	rm -rf $(SPMP)/include/$(LIB_NAME)
+
+
+
+# Header rules
+
+.PHONY: headers
+
+headers:
+	rm -rf $(SPMP)/include/$(LIB_NAME)
+	mkdir $(SPMP)/include/$(LIB_NAME)
+	cp $(SRC_H) $(SPMP)/include/$(LIB_NAME)

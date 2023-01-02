@@ -1,0 +1,8 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+config.site:13: default build_alias set to i686-w64-mingw32
+config.site:20: default prefix set to C:/msys64/mingw32
+configure:610: checking for a BSD compatible install
+configure:663: checking whether build environment is sane
+configure:720: checking whether make sets ${MAKE}
