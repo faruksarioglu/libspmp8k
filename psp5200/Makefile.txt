@@ -1,0 +1,82 @@
+#
+# Colem port on PSP 
+#
+# Copyright (C) 2006 Ludovic Jacomme (ludovic.jacomme@gmail.com)
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+TARGET = 5200
+LIBSPMP8K = ../../..
+include $(LIBSPMP8K)/main.cfg
+LIBGAME=../../../libgame
+CC		= $(TOOLCHAIN)gcc
+AS		= $(TOOLCHAIN)as
+LD		= $(TOOLCHAIN)gcc
+CPP		= $(TOOLCHAIN)cpp
+OBJCOPY	= $(TOOLCHAIN)objcopy
+MKBING	= ../../tools/bingtools/mkbing
+RM		= rm -f
+DINGOO_SDK=../../..
+
+
+# Define the compiler settings here:
+
+SOURCE    = .
+LIB_PATH  = $(DINGOO_SDK)/lib
+LIBS      =  -lSDL13 -lsml -lpng -lgame -lc -lgcc -lm -lz -lnosys -lstdc++ -L../../libgame
+
+OBJS = \
+antic.o atari.o atari_sdl.o binload.o \
+  cartridge.o cassette.o colours.o compfile.o cpu.o cycle_map.o \
+  devices.o gtia.o input.o log.o memory.o monitor.o  \
+  pbi.o pia.o pokey.o pokeysnd.o remez.o rtime.o screen.o sio.o \
+  statesav.o ui_basic.o ui.o util.o \
+  psp_main.o psp_kbd.o psp_gu.o psp_sdl.o psp_font.o \
+  psp_danzeff.o miniunz.o ioapi.o unzip.o gp2x_psp.o ui1.o\
+ 
+INCLUDE   = -I../../../include -I../../../include/sdl13 -I../../../libgame -I.
+
+#Debug.o \
+#cpulcd.o
+#psp_menu.o \
+#psp_menu_help.o \
+#psp_menu_set.o \
+#psp_menu_kbd.o \
+#psp_danzeff.o \
+#psp_fmgr.o
+
+CFLAGS	= -O2 -g -c $(INCLUDE) -I/mingw32/arm-none-eabi/include -nostdlib  -mcpu=arm926ej-s -msoft-float -Wno-unused-parameter -finline-functions -fomit-frame-pointer -msoft-float -fno-builtin -fno-exceptions -Wno-unused-parameter -DHAVE_CONFIG_H -I. -O2 -D_REENTRANT -funroll-loops -ffast-math -fomit-frame-pointer -fno-strength-reduce -finline-functions -fsingle-precision-constant -DNO_STDIO_REDIRECT -Wno-int-conversion
+ASFLAGS	= -mcpu=arm9
+
+MORE_CFLAGS =  -I. -Ilibzip  -static -I$(LIBSPMP8K)/include -I$(LIBSPMP8K)/include/SDL -DSOUND -DSTEREO_SOUND -DHAVE_UNISTD_H -DHAVE_FCNTL_H -DHAVE_TIME_H
+
+CFLAGS +=  $(MORE_CFLAGS) -fsigned-char \
+    -funroll-loops -ffast-math -fomit-frame-pointer -fno-strength-reduce -finline-functions
+CXXFLAGS = $(CFLAGS) $(MORE_CFLAGS) -fno-exceptions -fno-rtti
+
+LIBS += -L$(LIBSPMP8K)/lib -lSDL -lpng -lz -lm -lstdc++
+
+include $(LIBGAME)/libgame.mk
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+.cpp.o:
+	$(CXX) $(CFLAGS) -c $< -o $@
+
+#$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) $(LIBS) -o $(TARGET)
+
+clean:
+	rm -f $(OBJS) $(TARGET)
