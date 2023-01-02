@@ -1,0 +1,10 @@
+M.A.M.E. vGCW0 1.2 (based on 0.37b5) (Nov 17 2022) - Multiple Arcade Machine Emulator
+Copyright (C) 1997-2000 by Nicola Salmoria and the MAME Team
+
+Usage:  MAME gamename [options]
+
+        MAME -list      for a brief list of supported games
+        MAME -listfull  for a full list of supported games
+
+See readme.txt for a complete list of options.
+
